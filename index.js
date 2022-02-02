@@ -44,9 +44,9 @@ app.get("/admin/getMerchantUsers",async(req, res)=>{
 app.post("/admin/createUser",async(req, res)=>{
   try{
     const data = req.body;
-    console.log("dataa = ",data);
+    console.log("data = ",data);
     await User.add(data)
-    res.send({msg:'user added'});
+    res.send({msg:'User added successfully'});
   }catch(error){
     res.status(400).send(error.message);
   } 
@@ -55,10 +55,14 @@ app.post("/admin/createUser",async(req, res)=>{
 // admin ban users_id in request 
 app.post("/admin/banUser",async(req, res)=>{
   try{
+    if (req.body.id == null ){
+      res.status(400).send(error.message);
+    }else{
     const id = req.body.id;
     const data =  {"banned": "true"};
     await User.doc(id).update(data);
     res.send({msg:'user banned'});
+  }
   }catch(error){
     res.status(400).send(error.message);
   } 
@@ -73,7 +77,7 @@ app.post("/admin/RemoveList",async(req, res)=>{
     if (req.body.id){
       const id = req.body.id;
       await Lists.doc(id).delete();
-      res.send({msg:'List removed'});
+      res.send({msg:'List removed successfully'});
     }else {
       res.send({msg:'Invalid data'});
     }
@@ -99,13 +103,17 @@ app.get("/admin/getLists",async(req, res)=>{
 // admin consult dispute 
 app.get("/admin/getDispute",async(req, res)=>{
   try{
-      const id = req.body.id;
-      const snapshot = await Disputes.doc(id).get();
-    if (snapshot.data() != null) {
-      res.send (snapshot.data());
-    }
-    else res.status(400).send(error.message);
-    //const snapshot2 = await UserMerchant.doc(snapshot.data().idmerchand).get() 
+    if (req.body.id == null){
+      res.status(400).send(error.message);
+    }else{
+          const id = req.body.id;
+          const snapshot = await Disputes.doc(id).get();
+          if (snapshot.data() != null) {
+            res.send (snapshot.data());
+          }
+          else res.status(400).send(error.message);
+        }
+          //const snapshot2 = await UserMerchant.doc(snapshot.data().idmerchand).get() 
   }catch(error){
       res.status(400).send(error.message);
     } 
@@ -114,10 +122,14 @@ app.get("/admin/getDispute",async(req, res)=>{
 //admin submit resolve dispute_id and message in request  
 app.post("/admin/ResolveDispute",async(req, res)=>{
   try{
-    const id = req.body.id;
-    const data={"solving" : req.body.data};
-    const snapshot = await Disputes.doc(id).update(data);
-    res.send({msg:'resolved dispute'});
+    if (req.body.id == null || req.body.data){
+      res.status(400).send(error.message);
+    }else{
+      const id = req.body.id;
+      const data={"solving" : req.body.data};
+      const snapshot = await Disputes.doc(id).update(data);
+      res.send({msg:'resolved dispute'});
+    }
   }catch(error){
     res.status(400).send(error.message);
   } 
